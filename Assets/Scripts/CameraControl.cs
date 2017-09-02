@@ -16,6 +16,8 @@ public class CameraControl : MonoBehaviour
 	void Start()
 	{
 		print("Initialised Camera Control.");
+		transform.position = Vector3.up * 50;
+		transform.rotation = Quaternion.Euler(Vector3.right * 90);
 	}
 
 	// Update is called once per frame
