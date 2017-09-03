@@ -191,14 +191,14 @@ public class DiamondSquareTerrain : MonoBehaviour
 		// water level
 		if (height < _GroundHeight)
 		{
-			color = Color.Lerp(Color.blue, _sandBrown, height);
+			color = Color.blue;
 		}
 		// sand to grass level
 		else if (height >= _GroundHeight && height < _SandHeight)
 		{
 			color = Color.Lerp(_sandBrown, Color.green, height);
 		}
-		// grass level
+		// grass level	
 		else if (height < _RockyHeight)
 		{
 			
@@ -208,7 +208,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 		// rocky level
 		else
 		{
-			color = Color.Lerp(_darkGrass,_rocky, height);
+			color = Color.Lerp(_darkGrass,_rocky, (float)(height - 1));
 		}
 		
 		

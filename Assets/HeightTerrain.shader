@@ -33,24 +33,21 @@
         void surf (Input IN, inout SurfaceOutput o)
         {    
             half4 c = tex2D (_DirtTex, IN.uv_DirtTex);
-            o.Albedo = c.rgb;
+            o.Albedo = IN.color;
  
             o.Alpha = 0;
             if (IN.worldPos.y > _GroundHeight && IN.worldPos.y < _DirtBlendHeight)
             {
                 o.Alpha = 1 - ( ( ( _DirtBlendHeight - _GroundHeight ) - IN.worldPos.y ) / _DirtBlendHeight );
-                o.Albedo = c.rgb * IN.color.rgb; // vertex RGB
                 
                 
             } else if(IN.worldPos.y < _GroundHeight){
                 o.Alpha = 1;
-              o.Albedo = 1 - (1 + ( ( IN.worldPos.y ) / _DirtBlendHeight ));
               
             }
             else if (IN.worldPos.y > _GroundHeight)
             {
                 o.Alpha = c.a;
-                o.Albedo = IN.color;
                 
             }
             o.Albedo *= _Color.rgb;    
