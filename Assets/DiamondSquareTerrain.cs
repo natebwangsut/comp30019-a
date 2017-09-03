@@ -13,12 +13,11 @@ public class DiamondSquareTerrain : MonoBehaviour
 	// maximum height of terrain
 	public float mHeight;
 
-
+	public Mesh mesh;
+	
 	private Vector3[] mVerts;
 	private int mVertCount;
 	private Color[] clrs;
-	
-	
 	
 	// Use this for initialization
 	void Start ()
@@ -26,7 +25,6 @@ public class DiamondSquareTerrain : MonoBehaviour
 		CreateTerrain();
 	}
 
-	
 	// Use this to create the terrain
 	void CreateTerrain()
 	{
@@ -40,21 +38,18 @@ public class DiamondSquareTerrain : MonoBehaviour
 		float halfSize = mSize * 0.5f;
 		float divisionSize = mSize / mDivisions;
 
-		Mesh mesh = new Mesh();
+		mesh = new Mesh();
 		
 		GetComponent<MeshFilter>().mesh = mesh;
-		
 		MeshRenderer renderer = GetComponent<MeshRenderer>();
 		
 		//renderer.material.color = Color.green;
 		renderer.material.shader = Shader.Find("Unlit/PhongTest");
 
 		
-		
 		// assisting variable to help set up triangles without needing to keep track of where we are at
 		int triOffset = 0;
 
-		
 		for (int i = 0; i <= mDivisions; i++)
 		{
 			for (int j = 0; j <= mDivisions; j++)
@@ -137,9 +132,18 @@ public class DiamondSquareTerrain : MonoBehaviour
 		mesh.triangles = tris;
 		mesh.colors = clrs;
 
-
 		mesh.RecalculateBounds();
 		mesh.RecalculateNormals();
+		
+		// Add MeshCollider
+		addMeshCollider(mesh);
+	}
+
+	private void addMeshCollider(Mesh mesh)
+	{
+		// Add MeshCollider
+		MeshCollider meshc = gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
+		meshc.sharedMesh = mesh;
 	}
 	
 	// Executing diamond square algorithm
@@ -209,9 +213,8 @@ public class DiamondSquareTerrain : MonoBehaviour
 			color = Color.Lerp(_darkGrass,_rocky, (float)(height - 1));
 		}
 		
-		
-		
-		
 		return color;
 	}
+	
+	
 }
