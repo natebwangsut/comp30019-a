@@ -8,72 +8,43 @@ public class Movement : MonoBehaviour
 	public float movementSpeed;
 	public float rotationSpeed;
 
-	public float radius;
-
-	public float reset;
+	public bool useController;
 	
-	private float maxX;
-	private float maxZ;
-	
-	private float minX;
-	private float minZ;
-
 	// Use this for initialization
 	void Start ()
 	{
 		movementSpeed = 5;
 		rotationSpeed = movementSpeed * 10;
-
-		radius = 5;
-		reset = radius + 1;
-		
-		maxX = radius;
-		maxZ = radius;
-
-		minX = -maxX;
-		minZ = -maxZ;
+		useController = false;
 	}
 	
 	// Update is called once per frame
-	void Update() {
-		
+	void Update()
+	{
+
 		// Camera movement on plane
-		float translation = Input.GetAxis("Vertical") * movementSpeed;
-		float rotation = Input.GetAxis("Horizontal") * movementSpeed;
-		
-		translation *= Time.deltaTime;
-		rotation *= Time.deltaTime;
+		if (useController)
+		{
+			float translation = Input.GetAxis("Vertical") * movementSpeed;
+			float rotation = Input.GetAxis("Horizontal") * movementSpeed;
 
-//		if ((maxX < rotation + transform.position.x) 
-//		    || (minX > rotation + transform.position.x))
-//		{
-//			rotation = 0;
-//			if (transform.position.x > maxX)
-//			{
-//				rotation = (maxX - transform.position.x);
-//			}
-//			if (transform.position.x < minX)
-//			{
-//				rotation = (minX - transform.position.x);
-//			}
-//		}
-//		
-//		if ((maxZ < translation + transform.position.z) 
-//		    || (minZ > translation + transform.position.z))
-//		{
-//			translation = 0;
-//			if (transform.position.z > maxZ)
-//			{
-//				translation = maxZ - transform.position.z;
-//			}
-//			if (transform.position.z < minZ)
-//			{
-//				translation = minZ - transform.position.z;
-//			}
-//		}
-		
-		transform.Translate(rotation, 0, translation);
+			translation *= Time.deltaTime;
+			rotation *= Time.deltaTime;
 
+			transform.Translate(rotation, 0, translation);
+		}
+
+		// Use character controller
+		if (!useController)
+		{
+			CharacterController controller = GetComponent<CharacterController>();
+			Vector3 moveDirection = Vector3.zero;
+			moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+			moveDirection = transform.TransformDirection(moveDirection);
+			moveDirection *= movementSpeed;
+			controller.Move(moveDirection * Time.deltaTime);
+		}
+		
 		// Roll is custom created in input manager, be sure to see compatibility
 		float r = rotationSpeed * Input.GetAxis("Roll");
 		float h = rotationSpeed * Input.GetAxis("Mouse X");
@@ -82,26 +53,7 @@ public class Movement : MonoBehaviour
 		r *= Time.deltaTime;
 		h *= Time.deltaTime;
 		v *= Time.deltaTime;
-		
-		transform.Rotate(v, h, r);
 
-//		//
-//		if (transform.position.x > reset)
-//		{
-//			transform.position = new Vector3(maxX,transform.position.y,transform.position.z);
-//		}
-//		if (transform.position.x < -reset)
-//		{
-//			transform.position = new Vector3(minX,transform.position.y,transform.position.z);
-//		}
-//		//
-//		if (transform.position.z > reset)
-//		{
-//			transform.position = new Vector3(transform.position.x,transform.position.y,maxZ);
-//		}
-//		if (transform.position.z < -reset)
-//		{
-//			transform.position = new Vector3(transform.position.x,transform.position.y,minZ);
-//		}
+		transform.Rotate(v, h, r);
 	}
 }
