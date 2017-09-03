@@ -16,7 +16,7 @@ public class CameraControl : MonoBehaviour
 	void Start()
 	{
 		print("Initialised Camera Control.");
-		transform.position = Vector3.up * 50;
+		transform.position = Vector3.up * 20;
 		transform.rotation = Quaternion.Euler(Vector3.right * 90);
 	}
 

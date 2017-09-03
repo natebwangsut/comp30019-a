@@ -31,9 +31,6 @@ public class DiamondSquareTerrain : MonoBehaviour
 	void CreateTerrain()
 	{
 
-
-		
-		
 		mVertCount = (mDivisions + 1) * (mDivisions + 1);
 		mVerts = new Vector3[mVertCount];
 		Vector2[]uvs = new Vector2[mVertCount];
@@ -204,9 +201,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 		// grass level	
 		else if (height < _RockyHeight)
 		{
-			
 			color = Color.Lerp(Color.green, _darkGrass, height);
-			
 		}
 		// rocky level
 		else
