@@ -22,6 +22,20 @@ public class Water : MonoBehaviour {
 	private float _deepWaterHeight = -5.0f;
 	private float _waterOffset = 0.001f;
 	
+	
+	#pragma strict
+ 
+	private float scale = 0.1f;
+	private float speed = 1.0f;
+	private float noiseStrength = 1.0f;
+	
+	private float noiseWalk = 1.0f;
+ 
+	private Vector3[] baseHeight;
+
+	private Mesh mesh;
+	
+	
 	// Use this for initialization
 	void Start ()
 	{
@@ -46,7 +60,7 @@ public class Water : MonoBehaviour {
 		float halfSize = mSize * 0.5f;
 		float divisionSize = mSize / mDivisions;
 
-		Mesh mesh = new Mesh();
+		mesh = new Mesh();
 		
 		GetComponent<MeshFilter>().mesh = mesh;
 		
@@ -197,5 +211,25 @@ public class Water : MonoBehaviour {
 		
 		
 		return color;
+	}
+	
+	
+	
+	
+	void Update () {
+		
+		if (baseHeight == null)
+			baseHeight = mesh.vertices;
+  
+		var vertices = new Vector3[baseHeight.Length];
+		for (var i=0;i<vertices.Length;i++)
+		{
+			var vertex = baseHeight[i];
+			vertex.y += Mathf.Sin(Time.time * speed+ baseHeight[i].x + baseHeight[i].y + baseHeight[i].z) * scale;
+			vertex.y += Mathf.PerlinNoise(baseHeight[i].x + noiseWalk, baseHeight[i].y + Mathf.Sin(Time.time * 0.1f)    ) * noiseStrength;
+			vertices[i] = vertex;
+		}
+		mesh.vertices = vertices;
+		mesh.RecalculateNormals();
 	}
 }
