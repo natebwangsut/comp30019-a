@@ -1,24 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;	//required inorder to convert list to array
 using UnityEngine;
 
-public class DiamondSquareTerrain : MonoBehaviour
-{
+/* Source Code written by Kostas Sfikas, March 2017
+Tested with Unity 5.5.0 f3 Pesonal edition*/
 
-	// number of faces on each edge
-	// mDivision +1 represents the numACber of vertices on each edge
-	public int mDivisions;
-	// size of terrain
-	public float mSize;
-	// maximum height of terrain
-	public float mHeight;
+[RequireComponent(typeof(MeshFilter))]		// making sure that the gameobject has a MeshFilter component
+[RequireComponent(typeof(MeshRenderer))]	// making sure that the gameobject has a MeshRenderer component
+public class Water : MonoBehaviour {
+
+	
 
 
 	private Vector3[] mVerts;
 	private int mVertCount;
 	private Color[] clrs;
-	
-	
+	private int mDivisions = 128;
+
+	private float _baseWaterHeight = -1;
+	private float _deepWaterHeight = -5.0f;
+	private float _waterOffset = 0.001f;
 	
 	// Use this for initialization
 	void Start ()
@@ -31,8 +33,9 @@ public class DiamondSquareTerrain : MonoBehaviour
 	void CreateTerrain()
 	{
 
-
 		
+		
+		float mSize = 10;
 		
 		mVertCount = (mDivisions + 1) * (mDivisions + 1);
 		mVerts = new Vector3[mVertCount];
@@ -64,7 +67,9 @@ public class DiamondSquareTerrain : MonoBehaviour
 			{
 				
 				// creating the vertices for each division
-				mVerts[i * (mDivisions + 1) + j] = new Vector3(-halfSize+j*divisionSize, 0.0f, halfSize-i*divisionSize);
+				mVerts[i * (mDivisions + 1) + j] = new Vector3(-halfSize+j*divisionSize, _baseWaterHeight, halfSize-i*divisionSize);
+
+				clrs[i * (mDivisions + 1) + j] = assignColor(_baseWaterHeight);
 				
 				// the i*(mDivisions+1)+j] is meant to spread a 2D array into a 1D array
 				uvs[i*(mDivisions+1)+j] = new Vector2((float)i/mDivisions, (float)j/mDivisions);
@@ -87,17 +92,16 @@ public class DiamondSquareTerrain : MonoBehaviour
 			}
 		}
 		
-		
-		mVerts[0].y = Random.Range(-mHeight, mHeight); // top left
+		mVerts[0].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // top left
 		clrs[0] = assignColor(mVerts[0].y);
 		
-		mVerts[mDivisions].y = Random.Range(-mHeight, mHeight); // top right
+		mVerts[mDivisions].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // top right
 		clrs[mDivisions] = assignColor(mVerts[mDivisions].y);
 		
-		mVerts[mVerts.Length - 1].y = Random.Range(-mHeight, mHeight); // bottom right
+		mVerts[mVerts.Length - 1].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // bottom right
 		clrs[mVerts.Length - 1] = assignColor(mVerts[mVerts.Length - 1].y);
 		
-		mVerts[mVerts.Length - 1 - mDivisions].y = Random.Range(-mHeight, mHeight); // bottom left
+		mVerts[mVerts.Length - 1 - mDivisions].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // bottom left
 		clrs[mVerts.Length - 1 - mDivisions] = assignColor(mVerts[mVerts.Length - 1 - mDivisions].y);
 
 		
@@ -118,7 +122,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 
 				for (int k = 0; k < numSquares; k++)
 				{
-					DiamondSquare(row,col,squareSize, mHeight);
+					DiamondSquare(row,col,squareSize, _baseWaterHeight);
 					col += squareSize;
 				}
 
@@ -131,9 +135,12 @@ public class DiamondSquareTerrain : MonoBehaviour
 			// adjust this variable to determine how fast/slow the height goes down
 			// smaller number represents slower height change (a smoother terrain)
 			// higher number represents faster height change (a more jagged terrain)
-			mHeight *= 0.45f;
+			_baseWaterHeight *= 0.45f;
 
 		}
+		
+		
+		
 		// setting the mesh
 		mesh.vertices = mVerts;
 		mesh.uv = uvs;
@@ -176,43 +183,15 @@ public class DiamondSquareTerrain : MonoBehaviour
 		mVerts[botLeft + halfSize].y = (mVerts[botLeft].y + mVerts[mid].y + mVerts[botLeft + size].y) / 3 + Random.Range(-offset, offset);
 		clrs[botLeft + halfSize] = assignColor(mVerts[botLeft + halfSize].y);
 	}
-
+	
 	Color assignColor(float height)
 	{
-		float _GroundHeight = -1.5f;
-		float _SandHeight = (float)-0.5;
-		float _RockyHeight = (float) (mHeight - 0.1);
-		float _heightOffset = (float) 1.5;
-		Color color;
-		Color _sandBrown = new Color32(242, 215, 160, 255);
-		Color _darkGrass = new Color32(0, 102, 0, 255);
-		Color _rocky = new Color32(228, 225,223, 255);
-		Color _baseWater = new Color32(102,178,255,255);
-		Color _deepWater = new Color32(0, 0, 102, 255);
 
-		
-		// water level
-		if (height < _GroundHeight)
-		{
-			color = Color.Lerp(_baseWater, _deepWater, (height/-5.0f)-0.15f);
-		}
-		// sand to grass level
-		else if (height >= _GroundHeight && height < _SandHeight)
-		{
-			color = Color.Lerp(_sandBrown, Color.green, height);
-		}
-		// grass level	
-		else if (height < _RockyHeight)
-		{
-			
-			color = Color.Lerp(Color.green, _darkGrass, height);
-			
-		}
-		// rocky level
-		else
-		{
-			color = Color.Lerp(_darkGrass,_rocky, (float)(height - 1));
-		}
+		Color color;
+		Color _baseWater = new Color32(102,178,255,255/2);
+		Color _deepWater = new Color32(51, 153, 255, 255/2);
+
+		color = Color.Lerp(_deepWater,_baseWater, Mathf.Abs(height/(_baseWaterHeight-_waterOffset)));
 		
 		
 		
