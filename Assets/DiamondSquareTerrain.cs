@@ -50,7 +50,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 		MeshRenderer renderer = GetComponent<MeshRenderer>();
 		
 		//renderer.material.color = Color.green;
-		renderer.material.shader = Shader.Find("Custom/HeightTerrain");
+		renderer.material.shader = Shader.Find("Unlit/PhongTest");
 
 		
 		

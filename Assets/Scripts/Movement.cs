@@ -38,4 +38,15 @@ public class Movement : MonoBehaviour
 		
 		transform.Rotate(v, h, r);
 	}
+	
+	
+	// Help ?
+	void OnCollisionEnter(Collision theCollision)
+	{
+		if(theCollision.gameObject.name == "Terrain")
+		{
+			Debug.Log("Stop moving");
+			movementSpeed = 0;
+		} 
+	}
 }
