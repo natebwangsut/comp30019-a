@@ -129,7 +129,9 @@ public class DiamondSquareTerrain : MonoBehaviour
 			squareSize /= 2;
 			
 			// adjust this variable to determine how fast/slow the height goes down
-			mHeight *= 0.5f;
+			// smaller number represents slower height change (a smoother terrain)
+			// higher number represents faster height change (a more jagged terrain)
+			mHeight *= 0.45f;
 
 		}
 		// setting the mesh
