@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+public class CameraMovement : MonoBehaviour
 {
 	// Speed controls
 	public float movementSpeed;
@@ -15,7 +15,11 @@ public class Movement : MonoBehaviour
 	{
 		movementSpeed = 5;
 		rotationSpeed = movementSpeed * 10;
-		useController = false;
+		useController = true;
+		
+		// Initiate position
+		transform.position = Vector3.up * 20;
+		transform.rotation = Quaternion.Euler(Vector3.right * 90);
 	}
 	
 	// Update is called once per frame
@@ -23,7 +27,7 @@ public class Movement : MonoBehaviour
 	{
 
 		// Camera movement on plane
-		if (useController)
+		if (!useController)
 		{
 			float translation = Input.GetAxis("Vertical") * movementSpeed;
 			float rotation = Input.GetAxis("Horizontal") * movementSpeed;
@@ -35,7 +39,7 @@ public class Movement : MonoBehaviour
 		}
 
 		// Use character controller
-		if (!useController)
+		if (useController)
 		{
 			CharacterController controller = GetComponent<CharacterController>();
 			Vector3 moveDirection = Vector3.zero;
