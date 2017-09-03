@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DiamondSquareTerrain : MonoBehaviour
-{
+public class TerrainModify : MonoBehaviour {
+
 
 	// number of faces on each edge
 	// mDivision +1 represents the number of vertices on each edge
@@ -16,9 +16,6 @@ public class DiamondSquareTerrain : MonoBehaviour
 
 	private Vector3[] mVerts;
 	private int mVertCount;
-	private Color[] clrs;
-	
-	
 	
 	// Use this for initialization
 	void Start ()
@@ -30,27 +27,19 @@ public class DiamondSquareTerrain : MonoBehaviour
 	// Use this to create the terrain
 	void CreateTerrain()
 	{
-
-
 		
+		Terrain terrain = GetComponent<Terrain>();
 		
 		mVertCount = (mDivisions + 1) * (mDivisions + 1);
 		mVerts = new Vector3[mVertCount];
 		Vector2[]uvs = new Vector2[mVertCount];
 		int[] tris = new int[mDivisions * mDivisions * 6];
-		clrs = new Color[mVertCount];
 
 		float halfSize = mSize * 0.5f;
 		float divisionSize = mSize / mDivisions;
 
 		Mesh mesh = new Mesh();
-		
 		GetComponent<MeshFilter>().mesh = mesh;
-		
-		MeshRenderer renderer = GetComponent<MeshRenderer>();
-		
-		//renderer.material.color = Color.green;
-		renderer.material.shader = Shader.Find("Custom/HeightTerrain");
 
 		
 		
@@ -89,16 +78,9 @@ public class DiamondSquareTerrain : MonoBehaviour
 		
 		
 		mVerts[0].y = Random.Range(-mHeight, mHeight); // top left
-		clrs[0] = assignColor(mVerts[0].y);
-		
 		mVerts[mDivisions].y = Random.Range(-mHeight, mHeight); // top right
-		clrs[mDivisions] = assignColor(mVerts[mDivisions].y);
-		
 		mVerts[mVerts.Length - 1].y = Random.Range(-mHeight, mHeight); // bottom right
-		clrs[mVerts.Length - 1] = assignColor(mVerts[mVerts.Length - 1].y);
-		
 		mVerts[mVerts.Length - 1 - mDivisions].y = Random.Range(-mHeight, mHeight); // bottom left
-		clrs[mVerts.Length - 1 - mDivisions] = assignColor(mVerts[mVerts.Length - 1 - mDivisions].y);
 
 		
 		// number of iterations to complete the diamond-square steps down to the centre
@@ -136,7 +118,6 @@ public class DiamondSquareTerrain : MonoBehaviour
 		mesh.vertices = mVerts;
 		mesh.uv = uvs;
 		mesh.triangles = tris;
-		mesh.colors = clrs;
 
 
 		mesh.RecalculateBounds();
@@ -154,66 +135,19 @@ public class DiamondSquareTerrain : MonoBehaviour
 
 		
 		// DIAMOND STEP
-		int mid =  (row + halfSize) * (mDivisions + 1) +  (col + halfSize);
+		int mid = (int) (row + halfSize) * (mDivisions + 1) + (int) (col + halfSize);
 		// multiplication is faster than division
 		// offset is the random value added to average
 		mVerts[mid].y = (mVerts[topLeft].y + mVerts[topLeft + size].y + mVerts[botLeft].y + mVerts[botLeft + size].y)*0.25f + Random.Range(-offset,offset);
-		clrs[mid] = assignColor(mVerts[mid].y);
+			
 		
 		// SQUARE STEP
 		// Average out between the three surrounding vertices
 		mVerts[topLeft + halfSize].y = (mVerts[topLeft].y + mVerts[topLeft + size].y + mVerts[mid].y) / 3 + Random.Range(-offset, offset);
-		clrs[topLeft + halfSize] = assignColor(mVerts[topLeft + halfSize].y);
-		
 		mVerts[mid - halfSize].y = (mVerts[topLeft].y + mVerts[mid].y + mVerts[botLeft].y) / 3 + Random.Range(-offset, offset);
-		clrs[mid - halfSize] = assignColor(mVerts[mid - halfSize].y);
-		
+
 		mVerts[mid + halfSize].y = (mVerts[topLeft + size].y + mVerts[mid].y + mVerts[botLeft + size].y) / 3 + Random.Range(-offset, offset);
-		clrs[mid + halfSize] = assignColor(mVerts[mid + halfSize].y);
-		
+
 		mVerts[botLeft + halfSize].y = (mVerts[botLeft].y + mVerts[mid].y + mVerts[botLeft + size].y) / 3 + Random.Range(-offset, offset);
-		clrs[botLeft + halfSize] = assignColor(mVerts[botLeft + halfSize].y);
-	}
-
-	Color assignColor(float height)
-	{
-		float _GroundHeight = -1;
-		float _SandHeight = (float)-0.5;
-		float _RockyHeight = (float) (mHeight - 0.1);
-		float _heightOffset = (float) 1.5;
-		Color color;
-		Color _sandBrown = new Color32(242, 215, 160, 255);
-		Color _darkGrass = new Color32(0, 102, 0, 255);
-		Color _rocky = new Color32(228, 225,223, 255);
-		Color _rocky2 = new Color32(212, 209, 205, 255);
-
-		
-		// water level
-		if (height < _GroundHeight)
-		{
-			color = Color.Lerp(Color.blue, _sandBrown, height);
-		}
-		// sand to grass level
-		else if (height >= _GroundHeight && height < _SandHeight)
-		{
-			color = Color.Lerp(_sandBrown, Color.green, height);
-		}
-		// grass level
-		else if (height < _RockyHeight)
-		{
-			
-			color = Color.Lerp(Color.green, _darkGrass, height);
-			
-		}
-		// rocky level
-		else
-		{
-			color = Color.Lerp(_darkGrass,_rocky, height);
-		}
-		
-		
-		
-		
-		return color;
 	}
 }
