@@ -8,7 +8,9 @@ public class Movement : MonoBehaviour
 	public float movementSpeed;
 	public float rotationSpeed;
 
-	public float radius; 
+	public float radius;
+
+	public float reset;
 	
 	private float maxX;
 	private float maxZ;
@@ -23,6 +25,7 @@ public class Movement : MonoBehaviour
 		rotationSpeed = movementSpeed * 10;
 
 		radius = 5;
+		reset = radius + 1;
 		
 		maxX = radius;
 		maxZ = radius;
@@ -41,33 +44,33 @@ public class Movement : MonoBehaviour
 		translation *= Time.deltaTime;
 		rotation *= Time.deltaTime;
 
-		if ((maxX < rotation + transform.position.x) 
-		    || (minX > rotation + transform.position.x))
-		{
-			rotation = 0;
-			if (transform.position.x > maxX)
-			{
-				rotation = (maxX - transform.position.x);
-			}
-			if (transform.position.x < minX)
-			{
-				rotation = (minX - transform.position.x);
-			}
-		}
-		
-		if ((maxZ < translation + transform.position.z) 
-		    || (minZ > translation + transform.position.z))
-		{
-			translation = 0;
-			if (transform.position.z > maxZ)
-			{
-				translation = maxZ - transform.position.z;
-			}
-			if (transform.position.z < minZ)
-			{
-				translation = minZ - transform.position.z;
-			}
-		}
+//		if ((maxX < rotation + transform.position.x) 
+//		    || (minX > rotation + transform.position.x))
+//		{
+//			rotation = 0;
+//			if (transform.position.x > maxX)
+//			{
+//				rotation = (maxX - transform.position.x);
+//			}
+//			if (transform.position.x < minX)
+//			{
+//				rotation = (minX - transform.position.x);
+//			}
+//		}
+//		
+//		if ((maxZ < translation + transform.position.z) 
+//		    || (minZ > translation + transform.position.z))
+//		{
+//			translation = 0;
+//			if (transform.position.z > maxZ)
+//			{
+//				translation = maxZ - transform.position.z;
+//			}
+//			if (transform.position.z < minZ)
+//			{
+//				translation = minZ - transform.position.z;
+//			}
+//		}
 		
 		transform.Translate(rotation, 0, translation);
 
@@ -81,5 +84,24 @@ public class Movement : MonoBehaviour
 		v *= Time.deltaTime;
 		
 		transform.Rotate(v, h, r);
+
+//		//
+//		if (transform.position.x > reset)
+//		{
+//			transform.position = new Vector3(maxX,transform.position.y,transform.position.z);
+//		}
+//		if (transform.position.x < -reset)
+//		{
+//			transform.position = new Vector3(minX,transform.position.y,transform.position.z);
+//		}
+//		//
+//		if (transform.position.z > reset)
+//		{
+//			transform.position = new Vector3(transform.position.x,transform.position.y,maxZ);
+//		}
+//		if (transform.position.z < -reset)
+//		{
+//			transform.position = new Vector3(transform.position.x,transform.position.y,minZ);
+//		}
 	}
 }
