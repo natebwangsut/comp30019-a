@@ -23,8 +23,6 @@ public class Water : MonoBehaviour {
 	private float _waterOffset = 0.001f;
 	
 	
-	#pragma strict
- 
 	private float scale = 0.1f;
 	private float speed = 1.0f;
 	private float noiseStrength = 1.0f;

@@ -7,10 +7,10 @@ public class Movement : MonoBehaviour
 	// Speed controls
 	public float movementSpeed;
 	public float rotationSpeed;
-
 	public bool useController;
 
 
+	// Ground level height
 	private float _GroundHeight = -1.0f;
 	
 	// Use this for initialization
@@ -25,15 +25,14 @@ public class Movement : MonoBehaviour
 	void Update()
 	{
 
-		
+		// Slower movement when underwater
 		if (transform.position.y < _GroundHeight)
-		{
 			movementSpeed = 1.5f;
-		}
+		
 		else
-		{
 			movementSpeed = 5f;
-		}
+		
+		
 		
 		// Camera movement on plane
 		if (useController)
