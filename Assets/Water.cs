@@ -53,7 +53,7 @@ public class Water : MonoBehaviour {
 		MeshRenderer renderer = GetComponent<MeshRenderer>();
 		
 		//renderer.material.color = Color.green;
-		renderer.material.shader = Shader.Find("Unlit/PhongTest");
+		renderer.material.shader = Shader.Find("Custom/WaterShader");
 
 		
 		
