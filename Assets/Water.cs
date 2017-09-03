@@ -9,112 +9,193 @@ Tested with Unity 5.5.0 f3 Pesonal edition*/
 [RequireComponent(typeof(MeshFilter))]		// making sure that the gameobject has a MeshFilter component
 [RequireComponent(typeof(MeshRenderer))]	// making sure that the gameobject has a MeshRenderer component
 public class Water : MonoBehaviour {
-	/* This class creates a custom mesh that resembles a water (or other fluid) surface. The surface consists of 
-	a grid of points that extends along the X and Z axes. Those points have a fixed X and Z position, but their 
-	Y-value can be animated through time, using sinusoidal functions and thus create the effect of waves.
-	The Waves are created in relation to the position of any scene object which is tagged as "wavesource".
-	You can alter the number of wavesources and their position and see the effect that it has on the waves. */
 
-	List<GameObject> waveSources;	//all of the wave sources (will be collected by tag)
-	// declaring variables
-	float waterLevelY;			// the water - surface's level (along the Y - axis)
-	float surfaceActualWidth;	// surface - dimension along the X-axis
-	float surfaceActualLength;	// surface - dimension along the Z-axis
-	int surfaceWidthPoints;		// number of points on the X-axis
-	int surfaceLengthPoints;	// number of points on the Z-axis
-	float localTime;			// the current time (used for animating the waves)
-	float localTimeScale;			// local time scale (makes the animation go faster or slower - accepts negative values as well)
+	
+
+
+	private Vector3[] mVerts;
+	private int mVertCount;
+	private Color[] clrs;
+	private int mDivisions = 128;
+
+	private float _baseWaterHeight = -1;
+	private float _deepWaterHeight = -5.0f;
+	private float _waterOffset = 0.001f;
+	
 	// Use this for initialization
-	void Awake () {
-		// initialize the values of variables
-		waterLevelY = 0.0f;
-		surfaceActualWidth = 10;
-		surfaceActualLength = 10;
-		surfaceWidthPoints = 100;
-		surfaceLengthPoints = 100;
-		localTime = 0.0f;
-		localTimeScale = 2.0f;
-
-		CreateMesh ();	// create the initial geometry of the water-mesh
-
-		waveSources = new List<GameObject> ();										// initialize the wave sources list
-		waveSources = GameObject.FindGameObjectsWithTag ("wavesource").ToList ();	//find all the wavesources in the scene and pass them in the list
+	void Start ()
+	{
+		CreateTerrain();
 	}
 
-	// Update is called once per frame
-	void Update () {
-		localTime += Time.deltaTime * localTimeScale;	//advance local time...
-		UpdateWaterMesh ();	//update the geometry of the created mesh (animation happens here)
-	}
+	
+	// Use this to create the terrain
+	void CreateTerrain()
+	{
 
-	private void UpdateWaterMesh(){
-		/*This function updates the water mesh, by recalculating
-		each point's Y - value using the CalculateWaterY() function*/
-		Mesh waterMesh = GetComponent<MeshFilter> ().mesh; 	//get the current mesh from the MeshFilter
-		Vector3[] verts = waterMesh.vertices;				//get the mesh's vertices
-		for (int i = 0; i < verts.Length; i++) {	//cycle through all the vertices of the mesh
-			float x = verts [i].x;					//value of X stays the same
-			float y = RecalculatePointY(verts[i]);	//calculate the new Y-value for the mesh, using the calculateWaterY() function
-			float z = verts [i].z;					//value of Z stays the same
-			Vector3 p = new Vector3 (x,y,z);		//create a new point (with updated Y - value)
-			verts [i] = p;							//replace the vertice
-		}
-		waterMesh.vertices = verts;			//pass the updated vertices array to the existing mesh
-		waterMesh.RecalculateNormals();		//recalculate the normals of the surface inorder to have correct shading
-	}
+		
+		
+		float mSize = 10;
+		
+		mVertCount = (mDivisions + 1) * (mDivisions + 1);
+		mVerts = new Vector3[mVertCount];
+		Vector2[]uvs = new Vector2[mVertCount];
+		int[] tris = new int[mDivisions * mDivisions * 6];
+		clrs = new Color[mVertCount];
 
-	private float RecalculatePointY(Vector3 point){
-		/*This function recalculates the Y - value of each point of the water - surface
-		by applying a sinusoidal function on the point, for each of the wave - sources
-		that there are in the scene. */
-		float y = 0.0f;	//initialize the y - value (set to zero)
-		for (int i = 0; i < waveSources.Count; i++) {	//cycle through all of the wave sources
-			Vector2 p1 = new Vector2 (point.x, point.z);	// 2D - version of the incoming 3D Point (Vector3)
-			Vector2 p2 = new Vector2 (waveSources[i].transform.position.x, waveSources[i].transform.position.z);	// the wave-source's 2d-position
-			float dist = Vector2.Distance (p1,p2);	//the distance between the water-point and the current wave source
-			y += Mathf.Sin (dist * 12.0f - localTime) / (dist*20.0f+10.0f);	// apply the first wave
-		}
-		y += waterLevelY;	//add the water-level-Y value to the result of the calculation
-		return y;
-	}
+		float halfSize = mSize * 0.5f;
+		float divisionSize = mSize / mDivisions;
 
-	private void CreateMesh(){
-		/* This function creates the mesh object - triangle by triangle - 
-		 * and then applies it to the Mesh Filter's mesh. */
-		Mesh newMesh = new Mesh();
-		List<Vector3> verticeList = new List<Vector3>();	// list that will hold the mesh vertices
-		List<Vector2> uvList = new List<Vector2>();			// list that will hold the mesh UVs
-		List<int> triList = new List<int>();				// list that will hold the mesh triangles
-		//mesh - data creation double loop
-		for (int i = 0; i < surfaceWidthPoints; i++){		
-			for (int j = 0; j < surfaceLengthPoints; j++){
-				float x = MapValue (i, 0.0f, surfaceWidthPoints, -surfaceActualWidth/2.0f, surfaceActualWidth/2.0f);
-				float z = MapValue (j, 0.0f, surfaceLengthPoints, -surfaceActualLength/2.0f, surfaceActualLength/2.0f);
-				verticeList.Add(new Vector3(x, 0f, z));
-				uvList.Add(new Vector2(x, z));
-				//Skip if a new square on the plane hasn't been formed
-				if (i == 0 || j == 0)
-					continue;
-				//Adds the index of the three vertices in order to make up each of the two tris
-				triList.Add(surfaceLengthPoints * i +j); //Top right
-				triList.Add(surfaceLengthPoints * i + j - 1); //Bottom right
-				triList.Add(surfaceLengthPoints * (i - 1) + j - 1); //Bottom left - First triangle
-				triList.Add(surfaceLengthPoints * (i - 1) + j - 1); //Bottom left 
-				triList.Add(surfaceLengthPoints * (i- 1) + j); //Top left
-				triList.Add(surfaceLengthPoints * i + j); //Top right - Second triangle
+		Mesh mesh = new Mesh();
+		
+		GetComponent<MeshFilter>().mesh = mesh;
+		
+		MeshRenderer renderer = GetComponent<MeshRenderer>();
+		
+		//renderer.material.color = Color.green;
+		renderer.material.shader = Shader.Find("Unlit/PhongTest");
+
+		
+		
+		// assisting variable to help set up triangles without needing to keep track of where we are at
+		int triOffset = 0;
+
+		
+		for (int i = 0; i <= mDivisions; i++)
+		{
+			for (int j = 0; j <= mDivisions; j++)
+			{
+				
+				// creating the vertices for each division
+				mVerts[i * (mDivisions + 1) + j] = new Vector3(-halfSize+j*divisionSize, _baseWaterHeight, halfSize-i*divisionSize);
+
+				clrs[i * (mDivisions + 1) + j] = assignColor(_baseWaterHeight);
+				
+				// the i*(mDivisions+1)+j] is meant to spread a 2D array into a 1D array
+				uvs[i*(mDivisions+1)+j] = new Vector2((float)i/mDivisions, (float)j/mDivisions);
+
+				if (i < mDivisions && j < mDivisions)
+				{
+					int topLeft = i * (mDivisions + 1) + j;
+					int botLeft = (i + 1) * (mDivisions + 1) + j;
+
+					tris[triOffset] = topLeft;
+					tris[triOffset + 1] = topLeft + 1;
+					tris[triOffset + 2] = botLeft + 1;
+
+					tris[triOffset + 3] = topLeft;
+					tris[triOffset + 4] = botLeft + 1;
+					tris[triOffset + 5] = botLeft;
+
+					triOffset += 6;
+				}
 			}
 		}
-		//creating the mesh with the data generated above
-		newMesh.vertices = verticeList.ToArray();	//pass vertices to mesh
-		newMesh.uv = uvList.ToArray();				//pass uv list to mesh
-		newMesh.triangles = triList.ToArray();		//pass triabgles to mesh
-		newMesh.RecalculateNormals();				//recalculate mesh normals
-		GetComponent<MeshFilter>().mesh = newMesh;	//pass the created mesh to the mesh filter
-	}
+		
+		mVerts[0].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // top left
+		clrs[0] = assignColor(mVerts[0].y);
+		
+		mVerts[mDivisions].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // top right
+		clrs[mDivisions] = assignColor(mVerts[mDivisions].y);
+		
+		mVerts[mVerts.Length - 1].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // bottom right
+		clrs[mVerts.Length - 1] = assignColor(mVerts[mVerts.Length - 1].y);
+		
+		mVerts[mVerts.Length - 1 - mDivisions].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // bottom left
+		clrs[mVerts.Length - 1 - mDivisions] = assignColor(mVerts[mVerts.Length - 1 - mDivisions].y);
 
-	private float MapValue(float refValue, float refMin, float refMax, float targetMin, float targetMax){
-		/* This function converts the value of a variable (reference value) from one range (reference range) to another (target range)
-		in this example it is used to convert the x and z value to the correct range, while creating the mesh, in the CreateMesh() function*/
-		return targetMin + (refValue - refMin) * (targetMax - targetMin) / (refMax - refMin);
+		
+		// number of iterations to complete the diamond-square steps down to the centre
+		int iterations = (int) Mathf.Log(mDivisions, 2);
+		int numSquares = 1;
+		
+		// size of current square
+		int squareSize = mDivisions;
+
+		// current iteration that we are on
+		for (int i = 0; i < iterations; i++)
+		{
+			int row = 0;
+			for (int j = 0; j < numSquares; j++)
+			{
+				int col = 0;
+
+				for (int k = 0; k < numSquares; k++)
+				{
+					DiamondSquare(row,col,squareSize, _baseWaterHeight);
+					col += squareSize;
+				}
+
+				row += squareSize;
+			}
+
+			numSquares *= 2;
+			squareSize /= 2;
+			
+			// adjust this variable to determine how fast/slow the height goes down
+			// smaller number represents slower height change (a smoother terrain)
+			// higher number represents faster height change (a more jagged terrain)
+			_baseWaterHeight *= 0.45f;
+
+		}
+		
+		
+		
+		// setting the mesh
+		mesh.vertices = mVerts;
+		mesh.uv = uvs;
+		mesh.triangles = tris;
+		mesh.colors = clrs;
+
+
+		mesh.RecalculateBounds();
+		mesh.RecalculateNormals();
+	}
+	
+	// Executing diamond square algorithm
+	// height will be reduced every iteration; offset variable to keep track of that
+	
+	void DiamondSquare(int row, int col, int size, float offset)
+	{
+		int halfSize = (int) (size * 0.5f);
+		int topLeft = row * (mDivisions + 1) + col;
+		int botLeft = (row + size) * (mDivisions + 1) + col;
+
+		
+		// DIAMOND STEP
+		int mid =  (row + halfSize) * (mDivisions + 1) +  (col + halfSize);
+		// multiplication is faster than division
+		// offset is the random value added to average
+		mVerts[mid].y = (mVerts[topLeft].y + mVerts[topLeft + size].y + mVerts[botLeft].y + mVerts[botLeft + size].y)*0.25f + Random.Range(-offset,offset);
+		clrs[mid] = assignColor(mVerts[mid].y);
+		
+		// SQUARE STEP
+		// Average out between the three surrounding vertices
+		mVerts[topLeft + halfSize].y = (mVerts[topLeft].y + mVerts[topLeft + size].y + mVerts[mid].y) / 3 + Random.Range(-offset, offset);
+		clrs[topLeft + halfSize] = assignColor(mVerts[topLeft + halfSize].y);
+		
+		mVerts[mid - halfSize].y = (mVerts[topLeft].y + mVerts[mid].y + mVerts[botLeft].y) / 3 + Random.Range(-offset, offset);
+		clrs[mid - halfSize] = assignColor(mVerts[mid - halfSize].y);
+		
+		mVerts[mid + halfSize].y = (mVerts[topLeft + size].y + mVerts[mid].y + mVerts[botLeft + size].y) / 3 + Random.Range(-offset, offset);
+		clrs[mid + halfSize] = assignColor(mVerts[mid + halfSize].y);
+		
+		mVerts[botLeft + halfSize].y = (mVerts[botLeft].y + mVerts[mid].y + mVerts[botLeft + size].y) / 3 + Random.Range(-offset, offset);
+		clrs[botLeft + halfSize] = assignColor(mVerts[botLeft + halfSize].y);
+	}
+	
+	Color assignColor(float height)
+	{
+
+		Color color;
+		Color _baseWater = new Color32(102,178,255,255/2);
+		Color _deepWater = new Color32(51, 153, 255, 255/2);
+
+		color = Color.Lerp(_deepWater,_baseWater, Mathf.Abs(height/(_baseWaterHeight-_waterOffset)));
+		
+		
+		
+		
+		return color;
 	}
 }

@@ -6,7 +6,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 {
 
 	// number of faces on each edge
-	// mDivision +1 represents the number of vertices on each edge
+	// mDivision +1 represents the numACber of vertices on each edge
 	public int mDivisions;
 	// size of terrain
 	public float mSize;
@@ -179,7 +179,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 
 	Color assignColor(float height)
 	{
-		float _GroundHeight = -1;
+		float _GroundHeight = -1.5f;
 		float _SandHeight = (float)-0.5;
 		float _RockyHeight = (float) (mHeight - 0.1);
 		float _heightOffset = (float) 1.5;
@@ -187,13 +187,14 @@ public class DiamondSquareTerrain : MonoBehaviour
 		Color _sandBrown = new Color32(242, 215, 160, 255);
 		Color _darkGrass = new Color32(0, 102, 0, 255);
 		Color _rocky = new Color32(228, 225,223, 255);
-		Color _rocky2 = new Color32(212, 209, 205, 255);
+		Color _baseWater = new Color32(102,178,255,255);
+		Color _deepWater = new Color32(0, 0, 102, 255);
 
 		
 		// water level
 		if (height < _GroundHeight)
 		{
-			color = Color.blue;
+			color = Color.Lerp(_baseWater, _deepWater, (height/-5.0f)-0.15f);
 		}
 		// sand to grass level
 		else if (height >= _GroundHeight && height < _SandHeight)

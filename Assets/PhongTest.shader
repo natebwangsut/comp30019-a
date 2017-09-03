@@ -59,6 +59,11 @@ Shader "Unlit/PhongTest" {
          {
             float3 normalDirection = normalize(input.normalDir);
  
+            
+ 
+ 
+ 
+ 
             float3 viewDirection = normalize(
                _WorldSpaceCameraPos - input.posWorld.xyz);
             float3 lightDirection;
