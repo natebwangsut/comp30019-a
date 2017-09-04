@@ -8,10 +8,13 @@ public class Movement : MonoBehaviour
 	public float movementSpeed;
 	public float rotationSpeed;
 	public bool useController;
+<<<<<<< HEAD
 
 
 	// Ground level height
 	private float _GroundHeight = -1.0f;
+=======
+>>>>>>> parent of e848970... Moving Water & Slow Movement in Water
 	
 	// Use this for initialization
 	void Start ()
@@ -25,6 +28,7 @@ public class Movement : MonoBehaviour
 	void Update()
 	{
 
+<<<<<<< HEAD
 		// Slower movement when underwater
 		if (transform.position.y < _GroundHeight)
 			movementSpeed = 1.5f;
@@ -34,11 +38,11 @@ public class Movement : MonoBehaviour
 		
 		
 		
+=======
+>>>>>>> parent of e848970... Moving Water & Slow Movement in Water
 		// Camera movement on plane
 		if (useController)
 		{
-
-			
 			float translation = Input.GetAxis("Vertical") * movementSpeed;
 			float rotation = Input.GetAxis("Horizontal") * movementSpeed;
 
@@ -51,13 +55,10 @@ public class Movement : MonoBehaviour
 		// Use character controller
 		if (!useController)
 		{
-			
 			CharacterController controller = GetComponent<CharacterController>();
 			Vector3 moveDirection = Vector3.zero;
 			moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 			moveDirection = transform.TransformDirection(moveDirection);
-
-			
 			moveDirection *= movementSpeed;
 			controller.Move(moveDirection * Time.deltaTime);
 		}
