@@ -34,17 +34,16 @@ public class DiamondSquare : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-
 		// If a fixed terrain is wanted
 		if (!randomizeTerrain)
 		{
 			// Initialised the seed first
-			Random.InitState(seed);
-			
+			Random.InitState(seed);	
 		}
 		InitTerrain();
 	}
 
+    // Init Terrain
 	void InitTerrain()
 	{	
 		// Create new mesh
