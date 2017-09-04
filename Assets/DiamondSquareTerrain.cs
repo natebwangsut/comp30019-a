@@ -136,10 +136,10 @@ public class DiamondSquareTerrain : MonoBehaviour
 		mesh.RecalculateNormals();
 		
 		// Add MeshCollider
-		addMeshCollider(mesh);
+		AddMeshCollider(mesh);
 	}
 
-	private void addMeshCollider(Mesh mesh)
+	private void AddMeshCollider(Mesh mesh)
 	{
 		// Add MeshCollider
 		MeshCollider meshc = gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
@@ -183,7 +183,7 @@ public class DiamondSquareTerrain : MonoBehaviour
 		float _GroundHeight = -1.5f;
 		float _SandHeight = (float)-0.5;
 		float _RockyHeight = (float) (mHeight - 0.1);
-		float _heightOffset = (float) 1.5;
+		float _heightOffset = (float) 0.2f;
 		Color color;
 		Color _sandBrown = new Color32(242, 215, 160, 255);
 		Color _darkGrass = new Color32(0, 102, 0, 255);
@@ -195,7 +195,10 @@ public class DiamondSquareTerrain : MonoBehaviour
 		// water level
 		if (height < _GroundHeight)
 		{
-			color = Color.Lerp(_baseWater, _deepWater, (height/-5.0f)-0.15f);
+			
+			// Gradient between shallow sea and deep sea
+			// _heightOffset to extrapolate the gradient more on the shallow sea colour
+			color = Color.Lerp(_baseWater, _deepWater, (height/-5f)- _heightOffset);
 		}
 		// sand to grass level
 		else if (height >= _GroundHeight && height < _SandHeight)

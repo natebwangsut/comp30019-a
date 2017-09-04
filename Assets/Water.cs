@@ -65,7 +65,7 @@ public class Water : MonoBehaviour {
 		MeshRenderer renderer = GetComponent<MeshRenderer>();
 		
 		//renderer.material.color = Color.green;
-		renderer.material.shader = Shader.Find("Custom/WaterShader");
+		renderer.material.shader = Shader.Find("Unlit/WaterShader");
 
 		
 		
@@ -200,11 +200,12 @@ public class Water : MonoBehaviour {
 	{
 
 		Color color;
-		Color _baseWater = new Color32(102,178,255,255/2);
-		Color _deepWater = new Color32(51, 153, 255, 255/2);
+		
+		// Create a see-through effect on water surface
+		Color _baseWater = new Color32(102,178,255,(byte)(255*0.75));
+		Color _deepWater = new Color32(51, 153, 255, (byte)(255*0.75));
 
 		color = Color.Lerp(_deepWater,_baseWater, Mathf.Abs(height/(_baseWaterHeight-_waterOffset)));
-		
 		
 		
 		
