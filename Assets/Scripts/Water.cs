@@ -99,6 +99,8 @@ public class Water : MonoBehaviour {
 			}
 		}
 		
+		
+		
 		mVerts[0].y = Random.Range(_baseWaterHeight - _waterOffset, _baseWaterHeight); // top left
 		clrs[0] = assignColor(mVerts[0].y);
 		
