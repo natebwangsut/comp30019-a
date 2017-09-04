@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using UnityEngine;
 
+// Script to generate the terrain
+// Utilises Diamond Square algorithm to generate a full landscape and colours them according to their heights
+// Diamond Square algorithm code adapted from https://www.youtube.com/watch?v=1HV8GbFnCik
+
+
 public class DiamondSquare : MonoBehaviour
 {
 	public Mesh mesh;
 
 	public int seed;
 	public int divisions;
+	public bool randomizeTerrain;
 	
 	public float terrainSize;
 	public float maxHeight;
@@ -28,8 +34,14 @@ public class DiamondSquare : MonoBehaviour
 	// Use this for initialization
 	void Start ()
 	{
-		// Initialised the seed first
-		Random.InitState(seed);
+
+		// If a fixed terrain is wanted
+		if (!randomizeTerrain)
+		{
+			// Initialised the seed first
+			Random.InitState(seed);
+			
+		}
 		InitTerrain();
 	}
 
@@ -45,19 +57,22 @@ public class DiamondSquare : MonoBehaviour
 		renderer.material.shader = Shader.Find("Unlit/PhongTest");
 
 		
-		//
+		// initializing 
 		numVertices = (divisions + 1) * (divisions + 1);
 		meshVertices = new Vector3[numVertices];
 		
-		Vector2[] uvs = new Vector2[numVertices]; // storing 2d data
+		// storing 2d data
+		Vector2[] uvs = new Vector2[numVertices];
+		// storing data of triangles to be rendered
 		int[] triangles = new int[divisions * divisions * 6];
 
+		// array for storing colours of individual verticses
 		color = new Color[numVertices];
 
 		float divisionSize = terrainSize / divisions;
 		float halfTerrainSize = terrainSize * 0.5f; // (0.5f = 1/2)
 		
-		//
+		// start division of mesh by creating vertices on the mesh
 		int offset = 0;
 		for (int i=0; i<=divisions; i++)
 		{
@@ -97,6 +112,7 @@ public class DiamondSquare : MonoBehaviour
 			}
 		}
 
+		// start diamond square algorithm
 		RandomiseHeight();
 		
 		// setting the mesh
@@ -163,7 +179,7 @@ public class DiamondSquare : MonoBehaviour
 		}
 	}
 	
-	// Executing diamond square algorithm
+	// Executing Diamond step as part of diamond square algorithm
 	// height will be reduced every iteration; offset variable to keep track of that
 	void DiamondStep(int row, int col, int size, float offset)
      {
@@ -179,6 +195,7 @@ public class DiamondSquare : MonoBehaviour
 		color[mid] = assignColor(meshVertices[mid].y);
 	}
 
+	// Executing Square step as part of diamond Square algorithm
 	void SquareStep(int row, int col, int size, float offset)
 	{
 		int halfSize = (int) (size * 0.5f);
@@ -205,7 +222,7 @@ public class DiamondSquare : MonoBehaviour
 		color[botLeft + halfSize] = assignColor(meshVertices[botLeft + halfSize].y);
 	}
 	
-	
+	// Add mesh collider for collision detection
 	void AddMeshCollider(Mesh mesh)
 	{
 		// Add MeshCollider
@@ -213,12 +230,13 @@ public class DiamondSquare : MonoBehaviour
 		meshc.sharedMesh = mesh;
 	}
 	
+	// Assign colour to vertices based on height
 	Color assignColor(float height)
 	{
 		float _GroundHeight = -1.5f;
 		float _SandHeight = (float)-0.5;
 		float _RockyHeight = (float) (maxHeight - 1.5f);
-		float _heightOffset = (float) 1.5;
+		float _heightOffset = (float) 0.15f;
 		Color color;
 		Color _sandBrown = new Color32(242, 215, 160, 255);
 		Color _darkGrass = new Color32(0, 102, 0, 255);
@@ -230,7 +248,7 @@ public class DiamondSquare : MonoBehaviour
 		// water level
 		if (height < _GroundHeight)
 		{
-			color = Color.Lerp(_baseWater, _deepWater, (height/-5.0f)-0.15f);
+			color = Color.Lerp(_baseWater, _deepWater, (height/-5.0f)-_heightOffset);
 		}
 		// sand to grass level
 		else if (height >= _GroundHeight && height < _SandHeight)

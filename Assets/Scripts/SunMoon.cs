@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+
+// Script to simulate the Sun and Moon movement
+
 public class SunMoon : MonoBehaviour
 {
     public float speed;

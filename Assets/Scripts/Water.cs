@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;	//required inorder to convert list to array
 using UnityEngine;
 
-// 
+// Script to generate the water plane 
+// Utilises Diamond Square algorithm to generate a slightly jagged plane
+// Diamond Square algorithm code adapted from https://www.youtube.com/watch?v=1HV8GbFnCik
+// Moving waves code adapted from: http://answers.unity3d.com/questions/443031/sinus-for-rolling-waves.html
 
 [RequireComponent(typeof(MeshFilter))]		// making sure that the gameobject has a MeshFilter component
 [RequireComponent(typeof(MeshRenderer))]	// making sure that the gameobject has a MeshRenderer component
@@ -18,7 +21,6 @@ public class Water : MonoBehaviour {
 	private float _waterOffset = 0.001f;
 	
 	
-	#pragma strict
  
 	private float scale = 0.1f;
 	private float speed = 1.0f;
@@ -42,6 +44,7 @@ public class Water : MonoBehaviour {
 	void CreateTerrain()
 	{
 
+		// size of water plane
 		float mSize = 10;
 		
 		mVertCount = (mDivisions + 1) * (mDivisions + 1);
@@ -55,14 +58,11 @@ public class Water : MonoBehaviour {
 
 		mesh = new Mesh();
 		
+		// Using WaterShader shader on the water plane
 		GetComponent<MeshFilter>().mesh = mesh;
-		
-		MeshRenderer renderer = GetComponent<MeshRenderer>();
-		
-		//renderer.material.color = Color.green;
+		MeshRenderer renderer = GetComponent<MeshRenderer>();;
 		renderer.material.shader = Shader.Find("Unlit/WaterShader");
 
-		
 		
 		// assisting variable to help set up triangles without needing to keep track of where we are at
 		int triOffset = 0;
@@ -145,7 +145,6 @@ public class Water : MonoBehaviour {
 			_baseWaterHeight *= 0.45f;
 
 		}
-		
 		
 		
 		// setting the mesh

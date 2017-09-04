@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+// Script class for simulating camera
 
 public class CameraMovement : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class CameraMovement : MonoBehaviour
 	public float rotationSpeed;
 
 	public bool useController;
+
+	private float _GroundHeight = -1;
 	
 	// Use this for initialization
 	void Start ()
@@ -26,6 +29,16 @@ public class CameraMovement : MonoBehaviour
 	void Update()
 	{
 
+		// Simulate slower motion when underwater
+		if (transform.position.y < _GroundHeight)
+		{
+			movementSpeed = 1.5f;
+		}
+		else
+		{
+			movementSpeed = 5f;
+		}
+		
 		// Camera movement on plane
 		if (!useController)
 		{

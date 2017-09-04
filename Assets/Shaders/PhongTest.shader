@@ -26,7 +26,6 @@
 
 Shader "Unlit/PhongTest" {
    Properties {
-      _Color ("Diffuse Material Color", Color) = (1,1,1,1) 
       _SpecColor ("Specular Material Color", Color) = (1,1,1,1) 
       _Shininess ("Shininess", Float) = 10
    }
@@ -45,7 +44,6 @@ Shader "Unlit/PhongTest" {
          // color of light source (from "Lighting.cginc")
  
          // User-specified properties
-         uniform float4 _Color; 
          uniform float4 _SpecColor; 
          uniform float _Shininess;
  
