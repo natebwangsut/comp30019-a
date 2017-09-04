@@ -15,6 +15,10 @@ Brief description of the project's implementation
 5. Add in the water which also using the Diamond-Square algorithm to generate
    - By using `sin()` function the wave-like movement can be created
 
+**NOTE:**
+
+- Randomised can be check if the diamond-square algorithm can be seeded by the unity inspection.
+
 ## Camera
 
 **Implementation Steps**:
