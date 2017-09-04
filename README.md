@@ -15,6 +15,7 @@ Brief description of the project's implementation
 5. Add in the water which also using the Diamond-Square algorithm to generate
    - By using `sin()` function the wave-like movement can be created
 
+
 **NOTE:**
 
 - Randomised can be check if the diamond-square algorithm can be seeded by the unity inspection.
@@ -43,3 +44,13 @@ Brief description of the project's implementation
 5. Modify the colour of the sun and moon
    - Sun being bright orange
    - Moon being dark blue
+
+
+## Note
+
+*Accreditation*
+
+1. Diamond-Square Algorithm
+   - Code adapted from https://www.youtube.com/watch?v=1HV8GbFnCik
+2. Moving waves 
+   - Code adapted from: http://answers.unity3d.com/questions/443031/sinus-for-rolling-waves.html
