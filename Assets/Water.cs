@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Linq;	//required inorder to convert list to array
 using UnityEngine;
 
-/* Source Code written by Kostas Sfikas, March 2017
-Tested with Unity 5.5.0 f3 Pesonal edition*/
+// 
 
 [RequireComponent(typeof(MeshFilter))]		// making sure that the gameobject has a MeshFilter component
 [RequireComponent(typeof(MeshRenderer))]	// making sure that the gameobject has a MeshRenderer component
 public class Water : MonoBehaviour {
-
-	
-
 
 	private Vector3[] mVerts;
 	private int mVertCount;
@@ -19,8 +15,21 @@ public class Water : MonoBehaviour {
 	private int mDivisions = 128;
 
 	private float _baseWaterHeight = -1;
-	private float _deepWaterHeight = -5.0f;
 	private float _waterOffset = 0.001f;
+	
+	
+	#pragma strict
+ 
+	private float scale = 0.1f;
+	private float speed = 1.0f;
+	private float noiseStrength = 1.0f;
+	
+	private float noiseWalk = 1.0f;
+ 
+	private Vector3[] baseHeight;
+
+	private Mesh mesh;
+	
 	
 	// Use this for initialization
 	void Start ()
@@ -33,8 +42,6 @@ public class Water : MonoBehaviour {
 	void CreateTerrain()
 	{
 
-		
-		
 		float mSize = 10;
 		
 		mVertCount = (mDivisions + 1) * (mDivisions + 1);
@@ -46,14 +53,14 @@ public class Water : MonoBehaviour {
 		float halfSize = mSize * 0.5f;
 		float divisionSize = mSize / mDivisions;
 
-		Mesh mesh = new Mesh();
+		mesh = new Mesh();
 		
 		GetComponent<MeshFilter>().mesh = mesh;
 		
 		MeshRenderer renderer = GetComponent<MeshRenderer>();
 		
 		//renderer.material.color = Color.green;
-		renderer.material.shader = Shader.Find("Unlit/PhongTest");
+		renderer.material.shader = Shader.Find("Unlit/WaterShader");
 
 		
 		
@@ -184,6 +191,8 @@ public class Water : MonoBehaviour {
 		clrs[botLeft + halfSize] = assignColor(mVerts[botLeft + halfSize].y);
 	}
 	
+	
+	// Assign varying shades of blue to the water plane based on height of water plane (at the start)
 	Color assignColor(float height)
 	{
 
@@ -193,9 +202,27 @@ public class Water : MonoBehaviour {
 
 		color = Color.Lerp(_deepWater,_baseWater, Mathf.Abs(height/(_baseWaterHeight-_waterOffset)));
 		
-		
-		
-		
 		return color;
+	}
+	
+	
+	
+	// Simulate moving waves
+	// Code adapted from: http://answers.unity3d.com/questions/443031/sinus-for-rolling-waves.html
+	void Update () {
+		
+		if (baseHeight == null)
+			baseHeight = mesh.vertices;
+  
+		var vertices = new Vector3[baseHeight.Length];
+		for (var i=0;i<vertices.Length;i++)
+		{
+			var vertex = baseHeight[i];
+			vertex.y += Mathf.Sin(Time.time * speed+ baseHeight[i].x + baseHeight[i].y + baseHeight[i].z) * scale;
+			vertex.y += Mathf.PerlinNoise(baseHeight[i].x + noiseWalk, baseHeight[i].y + Mathf.Sin(Time.time * 0.1f)    ) * noiseStrength;
+			vertices[i] = vertex;
+		}
+		mesh.vertices = vertices;
+		mesh.RecalculateNormals();
 	}
 }

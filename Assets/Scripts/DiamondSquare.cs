@@ -217,7 +217,7 @@ public class DiamondSquare : MonoBehaviour
 	{
 		float _GroundHeight = -1.5f;
 		float _SandHeight = (float)-0.5;
-		float _RockyHeight = (float) (maxHeight - 0.1);
+		float _RockyHeight = (float) (maxHeight - 1.5f);
 		float _heightOffset = (float) 1.5;
 		Color color;
 		Color _sandBrown = new Color32(242, 215, 160, 255);
@@ -242,7 +242,7 @@ public class DiamondSquare : MonoBehaviour
 		{
 			color = Color.Lerp(Color.green, _darkGrass, height);
 		}
-		// rocky level
+		// rocky/snow level
 		else
 		{
 			color = Color.Lerp(_darkGrass,_rocky, (float)(height - 1));
