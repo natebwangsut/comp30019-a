@@ -24,8 +24,7 @@ Brief description of the project's implementation
    - `Vertical` and `Horizontal` for moving forward, backward, left and right.
    - `MouseX` and `MouseY` for camera's yaw and pitch.
 3. The Unity engine does not provide the roll part, we have to manually add that into the `InputManager` of the engine, and thus enabling us to use the `Input.GetAxis` with the newly defined set.
-4. ​
+4. Add a sphere collision into the camera object in the Unity engine.
+5. Add a Character Controller into the camera object in the Unity engine.
+   - Instead of directly moving the camera by `Transform.Translate` use the controller interface `CharacterController.Move` such that the Unity can automatically prevent the collision from happening.
 
-**NOTE**:
-
-All parameters are customizable through Unity Inspector.
